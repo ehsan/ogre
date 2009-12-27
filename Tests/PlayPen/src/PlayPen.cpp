@@ -6620,8 +6620,37 @@ protected:
 		mCamera->setPosition(0,0,200);
 		mCamera->lookAt(0,0,0);
 
+		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
+
 	
 	}
+
+	void test8TexturesFixedFunction()
+	{
+
+		MaterialPtr mat = MaterialManager::getSingleton().create("test8", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		Pass* p = mat->getTechnique(0)->getPass(0);
+		// create 8 textures the same
+		for (int i = 0; i < 8; ++i)
+		{
+			TextureUnitState* tu = p->createTextureUnitState("gras_02.png");
+			tu->setColourOperation(LBO_ALPHA_BLEND);
+			tu->setTextureUScroll((Real)i / 10.f);
+			tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+		}
+		mat->load();
+
+		Entity* e = mSceneMgr->createEntity("1", "cube.mesh");
+		e->setMaterialName(mat->getName());
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+
+		mCamera->setPosition(0,0,200);
+		mCamera->lookAt(0,0,0);
+
+
+	}
+
+
 
 	// Testing sharedptr bug report
 	class CollisionShape
@@ -6914,28 +6943,19 @@ protected:
 	{
 		mSceneMgr->setAmbientLight( ColourValue( 1, 1, 1 ) );
 
-		ManualObject *manual = mSceneMgr->createManualObject("manual");
-		manual->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_STRIP);
+		Entity* e = mSceneMgr->createEntity("1", "left-staple-portAnimnextSurface0Side0.mesh");
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+		//e->setDisplaySkeleton(true);
 
-		manual->position(-100.0, -100.0, 0.0);
-		manual->position(100.0, -100.0, 0.0);
-		manual->position(100.0, 100.0, 0.0);
-		manual->position(-100.0, 100.0, 0.0);
+		mAnimState = e->getAnimationState("next");
+		mAnimState->setEnabled(true);
 
-		manual->index(0);
-		manual->index(1);
-		manual->index(2);
-		manual->index(3);
-		manual->index(0);
 
-		manual->end();
-		SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		node->attachObject(manual);
+		mCamera->setPosition(0, 30, 30);
+		mCamera->lookAt(Vector3::ZERO);
+		mCamera->setNearClipDistance(1);
+		mCamera->setFarClipDistance(1000);
 
-		// of course the following two lines are pointless,
-		// only for demonstration purposes
-		node->detachObject(manual);
-		mSceneMgr->destroyManualObject(manual); //CRASH HERE 
 	}
 
 	void testManualObject2D()
@@ -7197,17 +7217,21 @@ protected:
 	void testAlphaToCoverage()
 	{
 
+		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+
+
 		MaterialPtr mat = MaterialManager::getSingleton().create("testa2c", 
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		Pass* p = mat->getTechnique(0)->getPass(0);
-		p->setAlphaRejectSettings(CMPF_GREATER, 96);
+		p->setAlphaRejectSettings(CMPF_GREATER, 0);
 		p->setLightingEnabled(false);
 		p->setCullingMode(CULL_NONE);
 		p->setAlphaToCoverageEnabled(true);
-		TextureUnitState* t = p->createTextureUnitState("leaf.png");
+		TextureUnitState* t = p->createTextureUnitState("TextureAtlas_Diffuse.dds");
 		t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 		Entity *e = mSceneMgr->createEntity("PlaneA2C", SceneManager::PT_PLANE);
 		e->setMaterialName(mat->getName());
+		e->setRenderQueueGroup(RENDER_QUEUE_MAIN + 1);
 		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(100, 0, 0))->attachObject(e);
 
 
@@ -7218,12 +7242,25 @@ protected:
 		p->setLightingEnabled(false);
 		p->setCullingMode(CULL_NONE);
 		p->setAlphaToCoverageEnabled(false);
-		t = p->createTextureUnitState("leaf.png");
+		t = p->createTextureUnitState("TextureAtlas_Diffuse.dds");
 		t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 		e = mSceneMgr->createEntity("PlaneNoA2C", SceneManager::PT_PLANE);
 		e->setMaterialName(mat->getName());
 		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-100, 0, 0))->attachObject(e);
 
+
+		Plane plane;
+		plane.normal = Vector3::UNIT_Y;
+		plane.d = 0;
+		MeshManager::getSingleton().createPlane("Myplane",
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+			4500,4500,10,10,true,1,5,5,Vector3::UNIT_Z);
+		Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+		pPlaneEnt->setMaterialName("Examples/GrassFloor");
+		pPlaneEnt->setCastShadows(false);
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+
+		/*
 		mat = MaterialManager::getSingleton().create("bg", 
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		p = mat->getTechnique(0)->getPass(0);
@@ -7237,6 +7274,7 @@ protected:
 		SceneNode* s = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0, 0, -10));
 		s->setScale(5,5,5);
 		s->attachObject(e);
+		*/
 
 		mCamera->setPosition(0,0,300);
 		mCamera->lookAt(Vector3::ZERO);
@@ -7378,24 +7416,19 @@ protected:
 
 	void createScene(void)
     {
+		Mesh::SubMeshNameMap map;
+		String nm("testName");
+		map["testName"] = 0;
+		map[nm] = 1;
 
+		mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
+		Light* lgh = mSceneMgr->createLight("mylight");
+		lgh->setType(Light::LT_DIRECTIONAL);
+		lgh->setDirection(Vector3::NEGATIVE_UNIT_Y);
 
-		mCamera->setPosition(-0.19199729, 1.0310142, -41.884644);
-		mCamera->setDirection(Vector3::NEGATIVE_UNIT_Z);
-		mCamera->setNearClipDistance(5);
-		mCamera->setFarClipDistance(5000);
-		Vector3 worldPos(-3.2326765, 2.003727, -59.996029);
+		mCamera->setPosition(0, 0, -100);
+		mCamera->lookAt(Vector3::ZERO);
 
-		Ogre::Vector3 pos = mCamera->getProjectionMatrix() * mCamera->getViewMatrix() * worldPos;
-		
-		// test image format identification
-		DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource("ASCII.dds", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		//DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource("grassWalpha.tga", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		//DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource("GreenSkin.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		//DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource("ogreborder.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		String typ = Image::getFileExtFromMagic(stream);
-
-		std::cout << pos;
 
 		AnyNumeric anyInt1(43);
 		AnyNumeric anyInt2(5);
@@ -7442,7 +7475,7 @@ protected:
         //testStencilShadows(SHADOWTYPE_STENCIL_ADDITIVE, true, true);
         //testStencilShadows(SHADOWTYPE_STENCIL_MODULATIVE, false, true);
         //testTextureShadows(SHADOWTYPE_TEXTURE_ADDITIVE, true);
-		//testTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE, true);
+		testTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE, true);
 		//testTextureShadowsIntegrated();
 		//testTextureShadowsIntegratedPSSM();
 		//testStencilShadowsMixedOpSubMeshes(false, true);
@@ -7469,7 +7502,7 @@ protected:
 		//testSimpleMesh();
 		//test2Windows();
 		//testStaticGeometry();
-		testStaticGeometryWithLOD(true);
+		//testStaticGeometryWithLOD(true);
 		//testBillboardTextureCoords();
 		//testBillboardOrigins();
 		//testReloadResources();
@@ -7482,6 +7515,7 @@ protected:
 		//testMRTCompositorScript();
 		//testSpotlightViewProj(true);
 		//test16Textures();
+		//test8TexturesFixedFunction();
 		//testProjectSphere();
 		//testLightScissoring(true);
 		//testLightClipPlanes(false);

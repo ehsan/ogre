@@ -31,6 +31,23 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 <p class="mainheader">
+    v1.6.5 [Shoggoth] (27 December 2009) - Maintenance Release</p>
+ <ul>  
+ <li>If Mesh::buildTangentVectors is called and causes vertex splits, and mesh had pose animation, make sure we fix up the poses too.</li>
+ <li>Change 0 -> NULL in Dx9 Present() call, user reported issue on Intel G33/G31 GPU allegedly resolved by this (illogical, but does no harm)</li>
+ <li>Fix a crash when trying to render a line list with stencil shadows enabled</li>
+ <li>Deal with Dx9 device lost for hardware occlusion queries better</li>
+ <li>Fix problem in OpenGL when mixing anisotropy levels in different texture units on the same pass</li>
+ <li>Fix Win x64 RTC issues with timer</li>
+ <li>Fix bug in HLSL with 3x4 matrix arrays</li>
+ <li>Culling fixes for InstancedGeometry</li>
+ <li>Prevent GLX ConfigDialog from creating empty dropdown elements which cause a crash when clicked on.</li>
+ <li>Fix straggling texture unit state bug with multiple contexts in GL.</li>
+ <li>PF_L8 is not likely to be a valid render target format on many cards, use PF_X8R8G8B8 as is the default for non-depth shadows.</li>
+ <li>Documentation updates</li>
+ </ul>
+ 
+ <p class="mainheader">
     v1.6.4 [Shoggoth] (27 Sept 2009) - Maintenance Release</p>
  <ul>  
 	<li><b>DirectX:</b>
