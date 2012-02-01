@@ -31,6 +31,8 @@ THE SOFTWARE.
 
 #include "../OgrePrerequisites.h"
 
+#include <sys/time.h>
+
 namespace Ogre
 {
 	/** Timer class */
