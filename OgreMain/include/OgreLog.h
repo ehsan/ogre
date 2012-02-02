@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreString.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 namespace pp
 {
     class Instance;
@@ -248,7 +248,7 @@ namespace Ogre {
 
 
 		};
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     protected:
         static pp::Instance* mInstance;
     public:

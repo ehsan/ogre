@@ -67,7 +67,8 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("Loading library " + mName);
 
 		String name = mName;
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_NACL || \
+    OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         // dlopen() does not add .so to the filename, like windows does for .dll
 	if (name.find(".so") == String::npos)
            name += ".so";

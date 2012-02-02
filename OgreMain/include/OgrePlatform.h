@@ -40,6 +40,7 @@ namespace Ogre {
 #define OGRE_PLATFORM_APPLE_IOS 5
 #define OGRE_PLATFORM_ANDROID 6
 #define OGRE_PLATFORM_NACL 7
+#define OGRE_PLATFORM_EMSCRIPTEN 8
 
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
@@ -122,6 +123,20 @@ namespace Ogre {
 #   endif
 #   ifndef OGRE_BUILD_RENDERSYSTEM_GLES2
 #       error GLES2 render system is required for NaCl (OGRE_BUILD_RENDERSYSTEM_GLES2=false in CMake)
+#   endif
+#elif defined( EMSCRIPTEN ) 
+#   define OGRE_PLATFORM OGRE_PLATFORM_EMSCRIPTEN
+#   ifndef OGRE_STATIC_LIB
+#       error OGRE must be built as static for Emscripten (OGRE_STATIC=true in CMake)
+#   endif
+#   ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
+#       error D3D9 is not supported on Emscripten (OGRE_BUILD_RENDERSYSTEM_D3D9 false in CMake)
+#   endif
+#   ifdef OGRE_BUILD_RENDERSYSTEM_GL
+#       error OpenGL is not supported on Emscripten (OGRE_BUILD_RENDERSYSTEM_GL=false in CMake)
+#   endif
+#   ifndef OGRE_BUILD_RENDERSYSTEM_GLES2
+#       error GLES2 render system is required for Emscripten (OGRE_BUILD_RENDERSYSTEM_GLES2=false in CMake)
 #   endif
 #else
 #   define OGRE_PLATFORM OGRE_PLATFORM_LINUX
@@ -241,7 +256,7 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Linux/Apple/iOs/Android/Symbian/NaCl Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
-    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL
+    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
