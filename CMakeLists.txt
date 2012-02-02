@@ -32,6 +32,21 @@ if(WIN32)
   set(CMAKE_SUPPRESS_REGENERATION true)
 endif()
 
+if (APPLE)
+  include(CMakeForceCompiler)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+    CMAKE_FORCE_C_COMPILER(clang GNU)
+    CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
+    SET(CMAKE_SIZEOF_VOID_P 4)
+	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
+  else ()
+    CMAKE_FORCE_C_COMPILER(llvm-gcc-4.2 GNU)
+    CMAKE_FORCE_CXX_COMPILER(llvm-g++-4.2 GNU)
+    SET(CMAKE_SIZEOF_VOID_P 4)
+	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvmgcc42")
+  endif ()
+endif ()
+
 project(OGRE)
 
 # Include necessary submodules
@@ -51,21 +66,6 @@ include(PreprocessorUtils)
 set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/CMake/Templates")
 set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
 
-
-if (APPLE)
-  include(CMakeForceCompiler)
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-    CMAKE_FORCE_C_COMPILER(clang GNU)
-    CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
-    SET(CMAKE_SIZEOF_VOID_P 4)
-	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
-  else ()
-    CMAKE_FORCE_C_COMPILER(llvm-gcc-4.2 GNU)
-    CMAKE_FORCE_CXX_COMPILER(llvm-g++-4.2 GNU)
-    SET(CMAKE_SIZEOF_VOID_P 4)
-	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvmgcc42")
-  endif ()
-endif ()
 
 #####################################################################
 # Set up the basic build environment
