@@ -41,6 +41,7 @@ set(CMAKE_MODULE_PATH
   "${OGRE_SOURCE_DIR}/CMake/Packages"
 )
 
+include(CMakeDetermineSystem)
 include(CMakeDependentOption)
 include(CheckCXXCompilerFlag)
 include(MacroLogFeature)
