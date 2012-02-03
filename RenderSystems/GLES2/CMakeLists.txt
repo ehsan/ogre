@@ -105,6 +105,20 @@ if (OGRE_BUILD_PLATFORM_NACL)
   )
   include_directories(src/NaCl include/NaCl)
   set(PLATFORM_HEADER_INSTALL "NaCl")
+elseif (OGRE_BUILD_PLATFORM_EMSCRIPTEN)
+  set(PLATFORM_HEADERS 
+    include/SDL/OgreGLES2Util.h
+    include/SDL/OgreSDLGLContext.h
+    include/SDL/OgreSDLGLSupport.h
+    include/SDL/OgreSDLWindow.h
+  )
+  set(PLATFORM_SOURCES
+    src/SDL/OgreSDLGLContext.cpp
+    src/SDL/OgreSDLGLSupport.cpp
+    src/SDL/OgreSDLWindow.cpp
+  )
+  include_directories(src/SDL include/SDL)
+  set(PLATFORM_HEADER_INSTALL "SDL")
 elseif (WIN32)
   set(PLATFORM_HEADERS 
     include/EGL/WIN32/OgreWin32EGLContext.h
