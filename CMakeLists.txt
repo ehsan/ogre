@@ -237,6 +237,12 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_BUILD_RENDERSYSTEM_GL TRUE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE)
+elseif (OGRE_BUILD_PLATFORM_APPLE_EMSCRIPTEN)
+  # Set build variables
+  set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for Emscripten" FORCE)
+  set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for Emscripten" FORCE)
+
+  remove_definitions(-msse)
 elseif (SYMBIAN)  
   set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES 1.x RenderSystem for Symbian" FORCE)  
 endif ()
