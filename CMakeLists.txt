@@ -241,6 +241,7 @@ elseif (OGRE_BUILD_PLATFORM_EMSCRIPTEN)
   # Set build variables
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for Emscripten" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for Emscripten" FORCE)
+  set(OGRE_CONFIG_ALLOCATOR 1 CACHE BOOL "Forcing internal allocator" FORCE)
 
   remove_definitions(-msse)
 elseif (SYMBIAN)  
