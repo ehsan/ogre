@@ -33,6 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 	class SDLGLContext;
+        class SDLGLSupport;
 	
 	
     class _OgrePrivate SDLWindow : public RenderWindow
@@ -41,6 +42,8 @@ namespace Ogre {
 		SDLGLSupport* mGLSupport;
 		SDLGLContext* mContext;
 		bool mClosed;
+                bool mActive;
+                SDL_Surface* mScreen;
 
 		void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
 		void initNativeCreatedWindow(const NameValuePairList *miscParams);
@@ -52,7 +55,7 @@ namespace Ogre {
 
 
 	public:
-        SDLWindow(SDLGLSupport* glsupport);
+        explicit SDLWindow(SDLGLSupport* glsupport);
         virtual  ~SDLWindow();
 
 		/**
@@ -67,6 +70,7 @@ namespace Ogre {
 		bool requiresTextureFlipping() const;
 		void destroy(void);
 		bool isClosed(void) const;
+		bool isActive(void) const;
 
         void swapBuffers(bool waitForVSync);
 

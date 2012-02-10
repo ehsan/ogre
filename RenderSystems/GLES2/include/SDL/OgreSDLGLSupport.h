@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __SDLGLSupport_H__
 
 #include "OgreGLES2Support.h"
+#include "OgreSDLWindow.h"
 
 namespace Ogre {
 	class GLES2PBuffer;

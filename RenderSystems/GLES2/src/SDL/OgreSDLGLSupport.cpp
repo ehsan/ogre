@@ -1,6 +1,7 @@
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
+#include "OgreGLES2RenderSystem.h"
 
 #include "OgreSDLGLSupport.h"
 
@@ -11,6 +12,7 @@ using namespace Ogre;
 SDLGLSupport::SDLGLSupport()
 {
 
+  LogManager::getSingleton().logMessage("\tGLSupport ctor called");
     SDL_Init(SDL_INIT_VIDEO);
 }
 
@@ -20,9 +22,9 @@ SDLGLSupport::~SDLGLSupport()
 
 void SDLGLSupport::addConfig(void)
 {
-    mVideoModes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_OPENGL);
+    SDL_Rect** videoModes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_OPENGL);
     
-    if (mVideoModes == (SDL_Rect **)0)
+    if (videoModes == (SDL_Rect **)0)
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to load video modes",
                 "SDLRenderSystem::initConfigOptions");
@@ -44,18 +46,20 @@ void SDLGLSupport::addConfig(void)
     optFullScreen.immutable = false;
 
     // Video mode possibilities
-    optVideoMode.name = "Video Mode";
-    optVideoMode.immutable = false;
-    for (size_t i = 0; mVideoModes[i]; i++)
-    {
-        char szBuf[16];
-		snprintf(szBuf, 16, "%d x %d", mVideoModes[i]->w, mVideoModes[i]->h);
-        optVideoMode.possibleValues.push_back(szBuf);
-        // Make the first one default
-        if (i == 0)
-        {
-            optVideoMode.currentValue = szBuf;
-        }
+    if (videoModes != (SDL_Rect**)-1) { // All resolutions
+      optVideoMode.name = "Video Mode";
+      optVideoMode.immutable = false;
+      for (size_t i = 0; videoModes[i]; i++)
+      {
+          char szBuf[16];
+                  snprintf(szBuf, 16, "%d x %d", videoModes[i]->w, videoModes[i]->h);
+          optVideoMode.possibleValues.push_back(szBuf);
+          // Make the first one default
+          if (i == 0)
+          {
+              optVideoMode.currentValue = szBuf;
+          }
+      }
     }
     
     //FSAA possibilities
@@ -83,7 +87,9 @@ void SDLGLSupport::addConfig(void)
 #endif
 
     mOptions[optFullScreen.name] = optFullScreen;
-    mOptions[optVideoMode.name] = optVideoMode;
+    if (videoModes != (SDL_Rect**)-1) {
+      mOptions[optVideoMode.name] = optVideoMode;
+    }
     mOptions[optFSAA.name] = optFSAA;
 	mOptions[optRTTMode.name] = optRTTMode;
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
@@ -97,8 +103,9 @@ String SDLGLSupport::validateConfig(void)
     return String("");
 }
 
-RenderWindow* SDLGLSupport::createWindow(bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle)
+RenderWindow* SDLGLSupport::createWindow(bool autoCreateWindow, GLES2RenderSystem* renderSystem, const String& windowTitle)
 {
+  LogManager::getSingleton().logMessage("\tGLSupport createWindow called");
 	if (autoCreateWindow)
     {
         ConfigOptionMap::iterator opt = mOptions.find("Full Screen");
@@ -136,7 +143,7 @@ RenderWindow* SDLGLSupport::createWindow(bool autoCreateWindow, GLRenderSystem* 
         unsigned int h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
 
         const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
-        return renderSystem->createRenderWindow(windowTitle, w, h, fullscreen, &winOptions);
+        return renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &winOptions);
     }
     else
     {
@@ -150,7 +157,8 @@ RenderWindow* SDLGLSupport::createWindow(bool autoCreateWindow, GLRenderSystem* 
 RenderWindow* SDLGLSupport::newWindow(const String &name, unsigned int width, unsigned int height, 
 	bool fullScreen, const NameValuePairList *miscParams)
 {
-	SDLWindow* window = new SDLWindow();
+  LogManager::getSingleton().logMessage("\tGLSupport newWindow called");
+	SDLWindow* window = new SDLWindow(this);
 	window->create(name, width, height, fullScreen, miscParams);
 	return window;
 }
