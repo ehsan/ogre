@@ -46,9 +46,9 @@ void SDLGLSupport::addConfig(void)
     optFullScreen.immutable = false;
 
     // Video mode possibilities
+    optVideoMode.name = "Video Mode";
+    optVideoMode.immutable = false;
     if (videoModes != (SDL_Rect**)-1) { // All resolutions
-      optVideoMode.name = "Video Mode";
-      optVideoMode.immutable = false;
       for (size_t i = 0; videoModes[i]; i++)
       {
           char szBuf[16];
@@ -60,6 +60,9 @@ void SDLGLSupport::addConfig(void)
               optVideoMode.currentValue = szBuf;
           }
       }
+    } else {
+      optVideoMode.possibleValues.push_back("640 x 480");
+      optVideoMode.currentValue = "640 x 480";
     }
     
     //FSAA possibilities
@@ -87,9 +90,7 @@ void SDLGLSupport::addConfig(void)
 #endif
 
     mOptions[optFullScreen.name] = optFullScreen;
-    if (videoModes != (SDL_Rect**)-1) {
-      mOptions[optVideoMode.name] = optVideoMode;
-    }
+    mOptions[optVideoMode.name] = optVideoMode;
     mOptions[optFSAA.name] = optFSAA;
 	mOptions[optRTTMode.name] = optRTTMode;
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
