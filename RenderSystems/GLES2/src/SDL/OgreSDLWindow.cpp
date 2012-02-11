@@ -69,6 +69,15 @@ namespace Ogre {
 
     }
 
+	void SDLWindow::getCustomAttribute( const String& name, void* pData )
+	{
+        if(name == "GLCONTEXT")
+        {
+            *static_cast<SDLGLContext **>(pData) = mContext;
+            return;
+        }
+	}
+
 	void SDLWindow::create(const String& name, unsigned int width, unsigned int height,
 	            bool fullScreen, const NameValuePairList *miscParams)
     {
@@ -162,6 +171,11 @@ namespace Ogre {
         // XXX FIXME
     }
 
+	void SDLWindow::windowMovedOrResized()
+	{
+		LogManager::getSingleton().logMessage("\twindowMovedOrResized called");
+	}
+	
     void SDLWindow::resize(unsigned int width, unsigned int height)
     {
         SDL_Surface* screen;
@@ -244,4 +258,9 @@ namespace Ogre {
 			delete [] tmpData;
 		}
 	}
+
+bool SDLWindow::requiresTextureFlipping() const
+{
+  return false;
+}
 }

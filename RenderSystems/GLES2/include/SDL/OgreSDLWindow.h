@@ -45,13 +45,9 @@ namespace Ogre {
                 bool mActive;
                 SDL_Surface* mScreen;
 
-		void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
-		void initNativeCreatedWindow(const NameValuePairList *miscParams);
-		void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
 		void reposition(int left, int top);
 		void resize(unsigned int width, unsigned int height);
 		void windowMovedOrResized();
-		void switchFullScreen(bool fullscreen);
 
 
 	public:
