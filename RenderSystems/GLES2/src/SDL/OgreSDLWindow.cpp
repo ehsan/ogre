@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreGLES2PixelFormat.h"
+#include "OgreSDLGLContext.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #   include <windows.h>
@@ -56,7 +57,7 @@ namespace Ogre {
 
     SDLWindow::SDLWindow(SDLGLSupport* glSupport) :
         mScreen(NULL), mActive(false), mClosed(false),
-        mGLSupport(glSupport)
+        mGLSupport(glSupport), mContext(0)
     {
     }
 
@@ -67,6 +68,8 @@ namespace Ogre {
         /*if (mScreen != NULL)
             SDL_FreeSurface(mScreen);*/
 
+        if (mContext)
+            delete mContext;
     }
 
 	void SDLWindow::getCustomAttribute( const String& name, void* pData )
@@ -140,6 +143,8 @@ namespace Ogre {
         mHeight = height;
 
         mActive = true;
+
+        mContext = new SDLGLContext(this, mGLSupport);
 
         if (!fullScreen)
             SDL_WM_SetCaption(title.c_str(), 0);
