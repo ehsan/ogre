@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,35 +25,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __COMMON_OGRE_ERRORDIALOG_H__
-#define __COMMON_OGRE_ERRORDIALOG_H__
 
-#include "OgrePrerequisites.h"
-#include "OgrePlatform.h"
+#ifndef __SDLGLContext_H__
+#define __SDLGLContext_H__
 
-// Bring in the specific platform's header file
-#if defined OGRE_GUI_WIN32
-# include "WIN32/OgreErrorDialogImp.h"
-#elif defined OGRE_GUI_gtk
-# include "gtk/OgreErrorDialogImp.h"
-#elif defined OGRE_GUI_GLX
-# include "GLX/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-# include "GLX/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
-# include "NaCl/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-# include "Emscripten/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-# include "iPhone/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
-# include "Symbian/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-# include "Android/OgreErrorDialogImp.h"
-#endif
+#include "OgreGLES2Context.h"
+#include "OgreSDLWindow.h"
+
+namespace Ogre {
+    class SDLGLSupport;
+
+    class _OgrePrivate SDLGLContext : public GLES2Context
+    {
+		private:
+			const SDLGLSupport *mGLSupport;
+            const SDLWindow* mWindow;
+            SDL_Surface* mContext;
+            unsigned int mWidth;
+            unsigned int mHeight;
+        public:
+            SDLGLContext(const SDLWindow * window, const SDLGLSupport *glsupport);
+            virtual ~SDLGLContext();
+
+			virtual void setCurrent();
+            virtual void endCurrent();
+            GLES2Context* clone() const;
+
+            void swapBuffers(bool waitForVSync);
+
+            void resize();
+
+    };
+}
 
 #endif

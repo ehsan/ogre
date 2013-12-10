@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,35 +25,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __COMMON_OGRE_ERRORDIALOG_H__
-#define __COMMON_OGRE_ERRORDIALOG_H__
 
-#include "OgrePrerequisites.h"
-#include "OgrePlatform.h"
+#ifndef __SDLGLSupport_H__
+#define __SDLGLSupport_H__
 
-// Bring in the specific platform's header file
-#if defined OGRE_GUI_WIN32
-# include "WIN32/OgreErrorDialogImp.h"
-#elif defined OGRE_GUI_gtk
-# include "gtk/OgreErrorDialogImp.h"
-#elif defined OGRE_GUI_GLX
-# include "GLX/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-# include "GLX/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
-# include "NaCl/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-# include "Emscripten/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-# include "iPhone/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
-# include "Symbian/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-# include "Android/OgreErrorDialogImp.h"
-#endif
+#include "OgreGLES2Support.h"
+#include "OgreSDLWindow.h"
+
+namespace Ogre {
+	class GLES2PBuffer;
+	
+    class _OgrePrivate SDLGLSupport : public GLES2Support
+    {
+        public:
+            SDLGLSupport();
+            virtual ~SDLGLSupport();
+
+			void switchMode(uint& width, uint& height, short& frequency);
+			String getDisplayName(void);
+
+			RenderWindow* createWindow(bool autoCreateWindow,
+                                       GLES2RenderSystem *renderSystem,
+                                       const String& windowTitle);
+									   
+	        RenderWindow* newWindow(const String& name,
+            	                    unsigned int width, unsigned int height,
+            	                    bool fullScreen,
+            	                    const NameValuePairList *miscParams = 0);
+									
+			void start(void);
+            void stop(void);
+            void addConfig(void);
+			void refreshConfig(void);
+            String validateConfig(void);
+            void setConfigOption(const String &name, const String &value);
+            void* getProcAddress(const Ogre::String& name);
+	};
+}
 
 #endif

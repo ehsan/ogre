@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
+#include "OgreGLES2PixelFormat.h"
+#include "OgreSDLGLContext.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #   include <windows.h>
@@ -53,8 +55,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    SDLWindow::SDLWindow() :
-        mScreen(NULL), mActive(false), mClosed(false)
+    SDLWindow::SDLWindow(SDLGLSupport* glSupport) :
+        mScreen(NULL), mActive(false), mClosed(false),
+        mGLSupport(glSupport), mContext(0)
     {
     }
 
@@ -65,7 +68,18 @@ namespace Ogre {
         /*if (mScreen != NULL)
             SDL_FreeSurface(mScreen);*/
 
+        if (mContext)
+            delete mContext;
     }
+
+	void SDLWindow::getCustomAttribute( const String& name, void* pData )
+	{
+        if(name == "GLCONTEXT")
+        {
+            *static_cast<SDLGLContext **>(pData) = mContext;
+            return;
+        }
+	}
 
 	void SDLWindow::create(const String& name, unsigned int width, unsigned int height,
 	            bool fullScreen, const NameValuePairList *miscParams)
@@ -130,11 +144,10 @@ namespace Ogre {
 
         mActive = true;
 
+        mContext = new SDLGLContext(this, mGLSupport);
+
         if (!fullScreen)
             SDL_WM_SetCaption(title.c_str(), 0);
-
-        glXGetVideoSyncSGI = (int (*)(unsigned int *))SDL_GL_GetProcAddress("glXGetVideoSyncSGI");
-        glXWaitVideoSyncSGI = (int (*)(int, int, unsigned int *))SDL_GL_GetProcAddress("glXWaitVideoSyncSGI");
     }
 
     void SDLWindow::destroy(void)
@@ -163,6 +176,11 @@ namespace Ogre {
         // XXX FIXME
     }
 
+	void SDLWindow::windowMovedOrResized()
+	{
+		LogManager::getSingleton().logMessage("\twindowMovedOrResized called");
+	}
+	
     void SDLWindow::resize(unsigned int width, unsigned int height)
     {
         SDL_Surface* screen;
@@ -192,13 +210,6 @@ namespace Ogre {
 
     void SDLWindow::swapBuffers(bool waitForVSync)
     {
-        if ( waitForVSync && glXGetVideoSyncSGI && glXWaitVideoSyncSGI )
-        {
-            unsigned int retraceCount;
-            glXGetVideoSyncSGI( &retraceCount );
-            glXWaitVideoSyncSGI( 2, ( retraceCount + 1 ) & 1, &retraceCount);
-        }
-
         SDL_GL_SwapBuffers();
         // XXX More?
     }
@@ -219,8 +230,8 @@ namespace Ogre {
 			buffer = mIsFullScreen? FB_FRONT : FB_BACK;
 		}
 	
-		GLenum format = Ogre::GLPixelUtil::getGLOriginFormat(dst.format);
-		GLenum type = Ogre::GLPixelUtil::getGLOriginDataType(dst.format);
+		GLenum format = Ogre::GLES2PixelUtil::getGLOriginFormat(dst.format);
+		GLenum type = Ogre::GLES2PixelUtil::getGLOriginDataType(dst.format);
 	
 		if ((format == GL_NONE) || (type == 0))
 		{
@@ -229,7 +240,7 @@ namespace Ogre {
 						"SDLWindow::copyContentsToMemory" );
 		}
 	
-		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
+		//glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
 		glReadPixels((GLint)dst.left, (GLint)dst.top,
 					 (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
 					 format, type, dst.data);
@@ -252,4 +263,9 @@ namespace Ogre {
 			delete [] tmpData;
 		}
 	}
+
+bool SDLWindow::requiresTextureFlipping() const
+{
+  return false;
+}
 }

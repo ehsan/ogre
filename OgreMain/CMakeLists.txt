@@ -481,6 +481,21 @@ if (OGRE_BUILD_PLATFORM_NACL)
   )
   set(PLATFORM_LIBS nosys)
   set(PLATFORM_HEADER_INSTALL "NaCl")
+elseif (OGRE_BUILD_PLATFORM_EMSCRIPTEN)
+  include_directories("include/Emscripten")
+  set(PLATFORM_HEADER_FILES
+    include/Emscripten/OgreConfigDialogImp.h
+    include/Emscripten/OgreErrorDialogImp.h
+    include/Emscripten/OgreTimerImp.h
+  )
+  set(PLATFORM_SOURCE_FILES
+    src/Emscripten/OgreConfigDialog.cpp
+    src/Emscripten/OgreErrorDialog.cpp
+    src/Emscripten/OgreTimer.cpp
+    src/OgreSearchOps.cpp
+  )
+  set(PLATFORM_LIBS nosys)
+  set(PLATFORM_HEADER_INSTALL "Emscripten")
 elseif (WIN32)
   include_directories("include/WIN32")
   set(PLATFORM_HEADER_FILES

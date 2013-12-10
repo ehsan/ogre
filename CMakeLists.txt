@@ -32,6 +32,21 @@ if(WIN32)
   set(CMAKE_SUPPRESS_REGENERATION true)
 endif()
 
+if (APPLE)
+  include(CMakeForceCompiler)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+    CMAKE_FORCE_C_COMPILER(clang GNU)
+    CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
+    SET(CMAKE_SIZEOF_VOID_P 4)
+	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
+  elseif (NOT OGRE_BUILD_PLATFORM_EMSCRIPTEN)
+    CMAKE_FORCE_C_COMPILER(llvm-gcc-4.2 GNU)
+    CMAKE_FORCE_CXX_COMPILER(llvm-g++-4.2 GNU)
+    SET(CMAKE_SIZEOF_VOID_P 4)
+	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvmgcc42")
+  endif ()
+endif ()
+
 project(OGRE)
 
 # Include necessary submodules
@@ -41,6 +56,7 @@ set(CMAKE_MODULE_PATH
   "${OGRE_SOURCE_DIR}/CMake/Packages"
 )
 
+include(CMakeDetermineSystem)
 include(CMakeDependentOption)
 include(CheckCXXCompilerFlag)
 include(MacroLogFeature)
@@ -50,21 +66,6 @@ include(PreprocessorUtils)
 set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/CMake/Templates")
 set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
 
-
-if (APPLE)
-  include(CMakeForceCompiler)
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-    CMAKE_FORCE_C_COMPILER(clang GNU)
-    CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
-    SET(CMAKE_SIZEOF_VOID_P 4)
-	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
-  else ()
-    CMAKE_FORCE_C_COMPILER(llvm-gcc-4.2 GNU)
-    CMAKE_FORCE_CXX_COMPILER(llvm-g++-4.2 GNU)
-    SET(CMAKE_SIZEOF_VOID_P 4)
-	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvmgcc42")
-  endif ()
-endif ()
 
 #####################################################################
 # Set up the basic build environment
@@ -236,6 +237,13 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_BUILD_RENDERSYSTEM_GL TRUE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE)
+elseif (OGRE_BUILD_PLATFORM_EMSCRIPTEN)
+  # Set build variables
+  set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for Emscripten" FORCE)
+  set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for Emscripten" FORCE)
+  set(OGRE_CONFIG_ALLOCATOR 1 CACHE BOOL "Forcing internal allocator" FORCE)
+
+  remove_definitions(-msse)
 elseif (SYMBIAN)  
   set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES 1.x RenderSystem for Symbian" FORCE)  
 endif ()
@@ -258,6 +266,7 @@ cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES 1.x RenderS
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES2 "Build OpenGL ES 2.x RenderSystem" FALSE "OPENGLES2_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLATFORM_APPLE_IOS "Build Ogre for iOS" FALSE "iPhoneSDK_FOUND;OPENGLES_FOUND;OPENGLES2_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLATFORM_NACL "Build Ogre for Google's Native Client (NaCl)" FALSE "OPENGLES2_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLATFORM_EMSCRIPTEN "Build Ogre for Emscripten" FALSE "OPENGLES2_FOUND" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PFX "Build ParticleFX plugin" TRUE)

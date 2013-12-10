@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreColourValue.h"
 
 #include "OgreImageResampler.h"
+#include "OgreMath.h"
 
 namespace Ogre {
 	ImageCodec::~ImageCodec() {

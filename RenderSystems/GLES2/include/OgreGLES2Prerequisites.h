@@ -82,6 +82,10 @@ THE SOFTWARE.
 #   include <GLES2/gl2ext.h>
 #   include <EGL/egl.h>
 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
+#   include <SDL.h>
+#endif
+
 // Function pointers for FBO extension methods
 // Declare them here since we don't have GLEW to do it for us
 

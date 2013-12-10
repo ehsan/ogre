@@ -51,7 +51,8 @@ typedef struct HINSTANCE__* hInstance;
 #    define DYNLIB_GETSYM( a, b ) dlsym( a, b )
 #    define DYNLIB_UNLOAD( a ) dlclose( a )
 
-#elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN || OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN || OGRE_PLATFORM == OGRE_PLATFORM_NACL || \
+      OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #    define DYNLIB_HANDLE void*
 #    define DYNLIB_LOAD( a ) 0
 #    define DYNLIB_GETSYM( a, b ) 0
